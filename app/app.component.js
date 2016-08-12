@@ -16,7 +16,10 @@ var AppComponent = (function () {
     AppComponent.prototype.upload = function () {
         var _this = this;
         this.readCSV(this.filesToUpload).then(function (result) {
-            console.log(_this.csvJSON(result));
+            var array = _this.csvToArray(result);
+            var arrayFormatado = _this.formatarResultado(array);
+            console.log(arrayFormatado);
+            console.log(array);
         }, function (error) {
             console.error(error);
         });
@@ -34,7 +37,7 @@ var AppComponent = (function () {
             fileReader.readAsText(files[0]);
         });
     };
-    AppComponent.prototype.csvJSON = function (csv) {
+    AppComponent.prototype.csvToArray = function (csv) {
         var array = csv.split("\n");
         var lines = this.removeEmptyRows(array);
         var result = [];
@@ -47,10 +50,39 @@ var AppComponent = (function () {
             }
             result.push(obj);
         }
-        return JSON.stringify(result);
+        return result;
     };
     AppComponent.prototype.removeEmptyRows = function (array) {
         return array.filter(function (line) { return line !== ""; });
+    };
+    AppComponent.prototype.criarJsonPadrao = function (item) {
+        return {
+            grupo: {
+                id: item.IDGrupo
+            },
+            produto: {
+                id: item.IDProduto
+            },
+            embalagem: {
+                id: 0
+            },
+            dataInicio: item.DataInicio,
+            precos: {
+                normal: item.PrecoNormal,
+                proposto: item.PrecoProposto,
+                limite: item.PrecoLimite
+            },
+            usuario: "USR_PRICING"
+        };
+    };
+    AppComponent.prototype.formatarResultado = function (array) {
+        var result = [];
+        for (var _i = 0, array_1 = array; _i < array_1.length; _i++) {
+            var item = array_1[_i];
+            var itemFormatado = this.criarJsonPadrao(item);
+            result.push(itemFormatado);
+        }
+        return result;
     };
     AppComponent = __decorate([
         core_1.Component({

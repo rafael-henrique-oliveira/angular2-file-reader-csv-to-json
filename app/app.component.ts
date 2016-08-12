@@ -14,7 +14,10 @@ export class AppComponent {
 
   upload() {
     this.readCSV(this.filesToUpload).then((result) => {
-      console.log(this.csvJSON(result));
+      var array = this.csvToArray(result);
+      var arrayFormatado = this.formatarResultado(array);
+      console.log(arrayFormatado);
+      console.log(array);
     }, (error) => {
       console.error(error);
     });
@@ -37,7 +40,7 @@ export class AppComponent {
     });
   }
 
-  csvJSON(csv: any) {
+  csvToArray(csv: any) {
     var array = csv.split("\n");
     var lines = this.removeEmptyRows(array);
     var result = [];
@@ -55,10 +58,41 @@ export class AppComponent {
       result.push(obj);
     }
 
-    return JSON.stringify(result);
+    return result;
   }
 
   removeEmptyRows(array: any) {
     return array.filter(line => line !== "");
+  }
+
+  criarJsonPadrao(item: any) {
+    return {
+      grupo: {
+        id: item.IDGrupo
+      },
+      produto: {
+        id: item.IDProduto
+      },
+      embalagem: {
+        id: 0
+      },
+      dataInicio: item.DataInicio,
+      precos: {
+        normal: item.PrecoNormal,
+        proposto: item.PrecoProposto,
+        limite: item.PrecoLimite
+      },
+      usuario: "USR_PRICING"
+    };
+  }
+
+  formatarResultado(array: any) {
+    var result = [];
+    for (var item of array) {
+      var itemFormatado = this.criarJsonPadrao(item);
+      result.push(itemFormatado);
+    }
+
+    return result;
   }
 }
